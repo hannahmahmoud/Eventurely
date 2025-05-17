@@ -197,8 +197,8 @@ public ResponseEntity<Object> getAllEvents() {
    Pageable pageable = PageRequest.of(0, 10, Sort.by("date").descending());
      Page<Events> eventsPage = eventRepo.findAll(pageable);
      Map<String, Object> response = new HashMap<>();
-     response.put("Status: ","Sucess");
-     response.put("Events: ",eventsPage);
+     response.put("Status","Sucess");
+     response.put("Events",eventsPage);
      return ResponseEntity.status(HttpStatus.OK)
      .body(response);
      

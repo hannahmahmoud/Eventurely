@@ -15,6 +15,7 @@ import com.website.bookingSystem.Repository.eventRepo;
 import com.website.bookingSystem.Validators.bookingValidator;
 import com.website.bookingSystem.Model.*;
 
+
 @Service
 public class bookingServics {
     @Autowired
@@ -27,16 +28,25 @@ public class bookingServics {
     public ResponseEntity<Object> bookEvent(Long eventId, Long userId) { 
         Map<String, Object> response = new HashMap<>();
         boolean exitedEvent = eventRepo.existsById(eventId);
+      
         if (!exitedEvent) {
-            response.put("status", "failed");
-            response.put("message", "Event not found!");
+            response.put("Status", "failed");
+            response.put("Message", "Event not found!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+       boolean reservationExists = bookingRepo.existsByEventIdAndUserId(eventId, userId);
+       if (reservationExists)
+       {
+        response.put("Status","Failed");
+        response.put("Message", "Reservation already exits!");
+         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+       }
         bookingValidator bookingValidator = new bookingValidator(userId, eventId);
         booking = new booking(bookingValidator.getUserId(), bookingValidator.getEventId(), LocalDateTime.now());
         bookingRepo.save(booking);
-        response.put("status", "success");
-        response.put("reservation", booking);
+        response.put("Status", "Success");
+        response.put("Message", booking);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -50,7 +60,7 @@ public class bookingServics {
             response.put("message", "User has not reserved any events yet.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        response.put("status", "success");
+        response.put("Status", "Success");
         response.put("reservations", bookings);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
